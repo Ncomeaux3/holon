@@ -1,0 +1,155 @@
+# The skill tree. This file is the source of truth: there is no edit UI.
+#
+# Every node has an id (stable, referenced by core.skill_links), a parent, a
+# name, and optional keywords. Keywords drive deterministic classification:
+# anything an entity's text matches is linked with classified_by 'rule' and
+# confidence 1, and only the leftovers cost a model call.
+#
+# Keywords are matched case insensitively on word boundaries, so "go" will not
+# match "going". Prefer specific terms; a keyword that fires on everything is
+# worse than no keyword.
+#
+# Fork and edit freely. Deleting a node stops new links, it does not delete
+# history: core.events keeps its own title snapshot.
+
+nodes:
+  # Attributes (top level) ----------------------------------------------------
+  - id: engineering
+    name: Engineering
+    description: Building software and the systems it runs on.
+  - id: business
+    name: Business
+    description: Turning work into something people pay for.
+  - id: communication
+    name: Communication
+    description: Being understood, in writing and out loud.
+  - id: health
+    name: Health
+    description: The body that carries everything else.
+  - id: life_ops
+    name: Life ops
+    description: Running a life without dropping things.
+
+  # Engineering ---------------------------------------------------------------
+  - id: coding
+    parent: engineering
+    name: Coding
+  - id: typescript
+    parent: coding
+    name: TypeScript
+    keywords: [typescript, javascript, node, react, next.js, tsx, npm, pnpm, eslint, vite, bun, deno, jsx]
+  - id: python
+    parent: coding
+    name: Python
+    keywords: [python, pytest, pandas, numpy, django, flask, fastapi]
+  - id: sql
+    parent: coding
+    name: SQL
+    keywords: [sql, postgres, postgresql, query, database, index, migration, sqlite, schema, join, pgvector, rls]
+
+  - id: systems
+    parent: engineering
+    name: Systems
+  - id: architecture
+    parent: systems
+    name: Architecture
+    keywords: [architecture, design doc, system design, scalability, refactor, monolith, microservice, api design, tech debt, rewrite]
+  - id: cloud
+    parent: systems
+    name: Cloud
+    keywords: [aws, gcp, azure, vercel, supabase, serverless, lambda, s3]
+  - id: devops
+    parent: systems
+    name: DevOps
+    keywords: [docker, kubernetes, ci, cd, terraform, deploy, deployment, pipeline, github actions, rollback, uptime, monitoring]
+
+  - id: ai
+    parent: engineering
+    name: AI
+  - id: agents
+    parent: ai
+    name: Agents
+    keywords: [agent, mcp, tool use, orchestrator, claude, llm, prompt, anthropic, openai, model context protocol, subagent]
+  - id: rag
+    parent: ai
+    name: RAG
+    keywords: [rag, embedding, embeddings, vector, pgvector, retrieval, semantic search]
+  - id: evals
+    parent: ai
+    name: Evals
+    keywords: [eval, evals, benchmark, hillclimb, ground truth]
+
+  # Business ------------------------------------------------------------------
+  - id: product
+    parent: business
+    name: Product
+    keywords: [product, roadmap, user research, feature, spec, mvp]
+  - id: sales
+    parent: business
+    name: Sales
+    keywords: [sales, pipeline, prospect, cold email, demo call]
+  - id: finance_literacy
+    parent: business
+    name: Finance literacy
+    keywords: [valuation, cash flow, margin, p&l, revenue, unit economics]
+  - id: marketing
+    parent: business
+    name: Marketing
+    keywords: [marketing, seo, landing page, campaign, positioning, copywriting]
+
+  # Communication -------------------------------------------------------------
+  - id: writing
+    parent: communication
+    name: Writing
+    keywords: [essay, blog post, newsletter, documentation, wrote, draft, writing, readme, article, notes, summarised, summarized]
+  - id: speaking
+    parent: communication
+    name: Speaking
+    keywords: [talk, presentation, podcast, keynote, conference]
+  - id: negotiation
+    parent: communication
+    name: Negotiation
+    keywords: [negotiation, negotiate, offer, contract, salary]
+
+  # Health --------------------------------------------------------------------
+  - id: strength
+    parent: health
+    name: Strength
+    keywords: [strength, squat, deadlift, bench, press, lifting, lift, gym, barbell, dumbbell, reps, sets, pull up, push up, workout]
+  - id: endurance
+    parent: health
+    name: Endurance
+    keywords: [run, running, ran, cycling, ride, swim, swam, cardio, 5k, 10k, marathon, hike, hiking, rowing, zone 2]
+  - id: nutrition
+    parent: health
+    name: Nutrition
+    keywords: [protein, calories, macros, diet, nutrition, meal prep, carbs, hydration, supplement, creatine]
+  - id: sleep
+    parent: health
+    name: Sleep
+    keywords: [sleep, slept, insomnia, bedtime, rem, nap]
+  - id: preventive_care
+    parent: health
+    name: Preventive care
+    keywords: [doctor, dentist, dental, screening, vaccine, vaccination, physical, bloodwork,
+      prescription, refill, optometrist, checkup, specialist]
+
+  # Life ops ------------------------------------------------------------------
+  - id: personal_finance
+    parent: life_ops
+    name: Personal finance
+    keywords: [budget, savings, invest, investing, 401k, ira, net worth, subscription, insurance, policy, premium, deductible, mortgage, rent, tax, taxes, expense, refinance]
+  - id: travel
+    parent: life_ops
+    name: Travel
+    keywords: [flight, hotel, trip, itinerary, passport, airbnb, points, miles, boarding, visa, layover, booking]
+  - id: cooking
+    parent: life_ops
+    name: Cooking
+    keywords: [recipe, cook, cooked, cooking, bake, baked, knife, kitchen, sourdough, roast, simmer, marinade, groceries]
+  - id: home
+    parent: life_ops
+    name: Home
+    keywords: [maintenance, hvac, furnace, gutter, gutters, filter, oil change, appliance,
+      plumbing, plumber, lawn, mower, roof, water heater, smoke detector, thermostat,
+      repair, serviced, tune up, warranty]

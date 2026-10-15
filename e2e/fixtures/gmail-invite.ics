@@ -1,0 +1,13 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Example//Reservations//EN
+METHOD:REQUEST
+BEGIN:VEVENT
+UID:gmail-fixture-1@example.com
+DTSTAMP:20261001T120000Z
+DTSTART;TZID=America/Chicago:{{DAY}}T190000
+DTEND;TZID=America/Chicago:{{DAY}}T203000
+SUMMARY:Dinner at Juniper Table
+LOCATION:418 Example Ave\, Portland
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,28 @@
+# XP per event type, seeded into core.xp_weights by pnpm setup.
+#
+# The scale is deliberately coarse and the formula deliberately visible:
+# level = min(99, floor(sqrt(xp / 100))). So 100 xp is level 1, 2500 is level 5,
+# 10000 is level 10. Do not invent precision that is not there. These are
+# ordinal judgements about effort, not measurements.
+#
+# An event type with no entry here contributes nothing, which is the safe
+# default when a new module starts emitting something.
+
+weights:
+  # Small: a thing done in an afternoon.
+  note_created: 2
+  task_completed: 5
+  article_read: 5
+  workout_logged: 5
+  recipe_cooked: 3
+  transaction_categorized: 0
+
+  # Medium: a thing done over days.
+  book_finished: 50
+  idea_researched: 10
+  trip_completed: 25
+  goal_checkin: 5
+
+  # Large: a thing done over weeks, that exists afterwards.
+  project_shipped: 200
+  goal_achieved: 100

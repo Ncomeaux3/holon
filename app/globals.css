@@ -1,0 +1,380 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+/* holon-ui (holon-apple Phase 3): the Apple edition tokens, their Tailwind
+ * theme and the navigation styles. Every colour, radius, shadow and type
+ * style comes from the package; the Holon alias layer was deleted at the
+ * holon-apple Close. POS keeps only what the package has no name for, with
+ * one override: --chart-1 to --chart-4 keep the Holon series (brand, sand,
+ * green, purple). */
+@import "@ncomeaux3/holon-ui/tokens.css";
+@import "@ncomeaux3/holon-ui/theme.css";
+@import "@ncomeaux3/holon-ui/components.css";
+@source "../node_modules/@ncomeaux3/holon-ui/src";
+
+/* POS tokens.
+ *
+ * The theme is the presence or absence of data-theme on <html>: light or dark
+ * force a scheme, and no attribute follows the device. The server writes the
+ * attribute from the cookie, so a forced theme is right on the first paint
+ * with no script.
+ */
+
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(html:not([data-theme]), html:not([data-theme]) *) {
+      @slot;
+    }
+  }
+}
+@custom-variant light {
+  &:where([data-theme="light"], [data-theme="light"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: light) {
+    &:where(html:not([data-theme]), html:not([data-theme]) *) {
+      @slot;
+    }
+  }
+}
+
+:root {
+  color-scheme: light dark;
+
+  /* The status bar and Dynamic Island in standalone mode; zero in a browser tab. */
+  --inset-t: env(safe-area-inset-top, 0px);
+  /* The tab capsule's distance from the screen edge. A phone reports its home
+     indicator band (34px on a Face ID iPhone) and the capsule sits 20px up,
+     just above the indicator, the way Instagram's bar hugs the bottom; a
+     browser tab reports zero and gets an 8px floor. It floated a whole band
+     higher until 2026-09-21 and gave up a row of content for it. */
+  --inset-b: max(calc(env(safe-area-inset-bottom, 0px) - 14px), 8px);
+  /* The tab capsule: 56px tall, one inset above the edge. Everything that
+     must clear it (toasts, sheets, the page bottom) measures from this. */
+  --tabbar: calc(56px + 2 * var(--inset-b));
+
+  /* The dark side of the Travel globe: a shadow must darken in both themes. */
+  --shade: light-dark(#1c1c1e, #000000);
+
+  /* The Holon series: brand cobalt, sand, then green and purple. */
+  --chart-1: #416aca;
+  --chart-2: #d6bb9a;
+  --chart-3: light-dark(#246a57, #4e9c85);
+  --chart-4: light-dark(#68568d, #9c8bc2);
+
+  --selection: light-dark(#eef2fa, rgba(155, 185, 255, 0.28));
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+html {
+  /* The page owns its pull: no browser refresh or rubber band doubling it. */
+  overscroll-behavior-y: contain;
+  /* In the installed app WebKit can size the layout viewport short by the
+   * status bar, so a fixed bottom: 0 tab bar floats that far above the screen
+   * edge with bare canvas under it. Sizing the root past the viewport by the
+   * same inset is the documented workaround (developer.apple.com/forums/
+   * thread/744327); a browser tab reports a zero inset and sees no change. */
+  min-height: calc(100% + var(--inset-t));
+}
+
+@layer base {
+  * {
+    border-color: var(--opaque-separator);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* Nothing is a sharp rectangle. Controls carry a radius by default and a
+   * utility on the element still wins, so a pill stays a pill. */
+  button,
+  [role='button'],
+  select,
+  textarea,
+  input:not([type='checkbox']):not([type='radio']):not([type='range']) {
+    border-radius: var(--r-control);
+  }
+
+  /* Tailwind v4's preflight gives a button the default cursor. Every button
+   * and every element playing one gets the pointer here, once, so a raw
+   * `<button>` a module still renders reads as clickable too (v1.2 phase 3a). */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+
+  /* No background on html: body's propagates to the canvas, so a fixed
+   * overlay would paint above it rather than under body's own. */
+  html {
+    @apply font-sans;
+    color: var(--label);
+  }
+
+  body {
+    background: var(--system-grouped-background);
+    color: var(--label);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    transition:
+      background 160ms var(--ease),
+      color 160ms var(--ease);
+  }
+
+  ::selection {
+    background: var(--selection);
+    color: var(--label);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--tertiary-system-fill);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--secondary-label);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--label);
+  }
+
+  /* Chrome's date picker glyph, drawn in the field's own ink. Left to the
+     browser it takes the colour scheme Chrome guesses, and on the owner's
+     Mac in dark that was a dark glyph on the dark field (v1.2 phase 1b).
+     A mask rather than a filter: a mask takes currentColor in either theme. */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    opacity: 0.8;
+    background-color: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 2v4'/%3E%3Cpath d='M16 2v4'/%3E%3Crect width='18' height='18' x='3' y='4' rx='2'/%3E%3Cpath d='M3 10h18'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 2v4'/%3E%3Cpath d='M16 2v4'/%3E%3Crect width='18' height='18' x='3' y='4' rx='2'/%3E%3Cpath d='M3 10h18'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+}
+
+@layer components {
+  /* The strip behind the phone's status bar (app/(app)/layout.tsx): clear at
+   * the top of the page, material once the page scrolls under it, the way an
+   * iOS bar behaves. A scroll-driven animation, so no scroll listener; a
+   * browser without scroll timelines shows the strip at all times. */
+  .statusbar {
+    animation: statusbar-fill linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 32px;
+  }
+  @keyframes statusbar-fill {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* One orchestrated reveal when a screen loads: the top-level blocks rise
+   * 6px and fade in, 20ms apart, capped at 80ms so content is fully in within
+   * a fifth of a second. Plays on navigation because the route's children
+   * remount; nothing else on a page moves by itself. will-change promotes
+   * this one wrapper to its own layer before the animation starts: without
+   * it, animating opacity on an ancestor of a backdrop-filter element (any
+   * glass surface inside, such as a sheet) can make Safari render the blur wrong for
+   * the duration of the animation. */
+  .reveal > * {
+    animation: rise 180ms var(--ease) both;
+    will-change: opacity, transform;
+  }
+  .reveal > :nth-child(2) { animation-delay: 20ms; }
+  .reveal > :nth-child(3) { animation-delay: 40ms; }
+  .reveal > :nth-child(4) { animation-delay: 60ms; }
+  .reveal > :nth-child(n + 5) { animation-delay: 80ms; }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  /* Below md the page pushes and pops instead (the view transitions after
+   * the reduced-motion block), so the stagger comes off: the two would stack
+   * and the page would rise inside its own slide. */
+  @media (max-width: 767px) {
+    .reveal > * {
+      animation: none;
+    }
+  }
+
+  /* An interactive card lifts a pixel under the pointer. */
+  .lift {
+    transition:
+      transform 200ms var(--ease),
+      box-shadow 200ms var(--ease);
+  }
+  .lift:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 var(--glass-edge),
+      0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Numbers. Tabular figures so a column of amounts lines up. */
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  /* Machine values: secrets, URLs, cron expressions. Geist like everything
+   * else, with tabular figures and a little tracking so a long token is still
+   * readable character by character. */
+  .code {
+    font-variant-numeric: tabular-nums slashed-zero;
+    letter-spacing: 0.02em;
+    word-break: break-all;
+  }
+
+  /* The universal small label: table heads, chips, metadata. Sentence case,
+   * 500, no tracking. The tracked uppercase treatment is retired. */
+  .label {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .eyebrow {
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--secondary-label);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* The dot beside an eyebrow or a status line. Still, never pulsing: motion
+   * never carries status alone and nothing on the dashboard breathes. */
+  .eyebrow .dot,
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex: none;
+  }
+
+  /* 64px hairline grid, used behind empty states and connect cards. */
+  .grid-bg {
+    background-image:
+      linear-gradient(to right, var(--separator) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--separator) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+}
+
+/* The tap scale and every transition are decorative and go for readers who
+ * ask for reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* The phone's page column is one opaque snapshot for holon-ui's push, pop and
+ * cross-fade (components.css); goBack() looks for the `page` class. */
+@media (max-width: 767px) {
+  .page {
+    background: var(--system-grouped-background);
+    transition: background 160ms var(--ease);
+    view-transition-name: page;
+  }
+}
+
+@layer components {
+  /* Zoomed out past 0.91 the constellation sets data-far on its group and a
+   * leaf's level line comes off: its name is already crowding its neighbours. */
+  .skill-view[data-far] .skill-far-hide {
+    opacity: 0;
+  }
+
+  /* While the view is in motion the constellation sets data-moving and the
+   * star glows come off: the blur filters cost 25ms a frame at Retina scale
+   * against 8ms without, which is the difference between 40fps and 120. */
+  .skill-view[data-moving] [filter] {
+    filter: none;
+  }
+  /* The halo is nothing but its blur: unblurred it is a flat disc three
+   * times the star, so while moving it goes rather than flattens. */
+  .skill-view[data-moving] [filter='url(#skill-glow-big)'] {
+    visibility: hidden;
+  }
+
+  /* The slow pulse on a skill that is gaining, from the design bundle. Off
+   * under reduced motion, which the bundle asks for by name: "Reduced motion
+   * should disable the scale-on-tap and the constellation animation." */
+  @keyframes skill-fadein {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .skill-breathe {
+    animation: skill-breathe 2.6s ease-in-out infinite;
+  }
+
+  @keyframes skill-breathe {
+    0%,
+    100% {
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 0.85;
+    }
+  }
+
+  /* Dust behind the constellation. Without it the starfield reads as a
+   * scattering of stray dots rather than as depth. */
+  .skill-twinkle {
+    animation: skill-twinkle 4s ease-in-out infinite;
+  }
+
+  @keyframes skill-twinkle {
+    0%,
+    100% {
+      opacity: 0.25;
+    }
+    50% {
+      opacity: 0.9;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skill-breathe,
+    .skill-twinkle {
+      animation: none;
+    }
+  }
+}

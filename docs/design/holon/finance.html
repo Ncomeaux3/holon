@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Finance · Holon mockup</title>
+<link rel="stylesheet" href="holon.css">
+<style>
+  .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .toolbar .status { margin-left: auto; }
+  .chart { width: 100%; height: auto; display: block; margin-top: 8px; }
+  .chart .axis line { stroke: var(--rule); stroke-width: 1; }
+  .chart .axis text { font: 11px var(--font); fill: var(--ink-3); text-anchor: end; font-variant-numeric: tabular-nums; }
+  .chart .axis text.x { text-anchor: start; }
+  .chart .axis text.xe { text-anchor: end; }
+  .chart .area { fill: var(--chart-1); opacity: 0.08; }
+  .chart .line { fill: none; stroke: var(--chart-1); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .chart .avg { stroke: var(--chart-2); stroke-width: 2; stroke-dasharray: 4 5; }
+  .chart .end { fill: var(--bg-elev); stroke: var(--chart-1); stroke-width: 2; }
+  .kpi .value.positive { color: var(--positive); }
+  .acct .share { width: 90px; }
+  .budget .row { grid-template-columns: 1fr auto; }
+  .budget .bar { margin-top: 6px; }
+  /* Mockup only: the app's LineChart lays its labels out in the DOM and stays readable at 402. */
+  @media (max-width: 767px) { .chart { height: 140px; } .chart .axis text { display: none; } }
+</style>
+</head>
+<body data-page="finance">
+<main>
+  <header class="page-head">
+    <div><h1 class="t-headline">Finance</h1><p>Six accounts through SimpleFIN. Budgets reset on the 1st.</p></div>
+    <button class="btn sm quiet" type="button">Sync now</button>
+  </header>
+
+  <div class="toolbar">
+    <div class="segments" role="group" aria-label="Section">
+      <button aria-pressed="true">Overview</button><button aria-pressed="false">Accounts</button><button aria-pressed="false">Budgets</button><button aria-pressed="false">Subscriptions</button><button aria-pressed="false">Transactions</button>
+    </div>
+    <span class="status"><span class="dot positive"></span>Synced today at 06:12</span>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="label">Net worth</div><div class="value">$72,640</div><div class="meta num">assets $80,980, debt $8,340</div></div>
+    <div class="kpi"><div class="label">30 days</div><div class="value positive">+$1,240</div><div class="meta num">+1.7% from $71,400</div></div>
+    <div class="kpi"><div class="label">Due in 14 days</div><div class="value">$2,101.78</div><div class="meta">6 charges, 3 subscriptions</div></div>
+    <div class="kpi"><div class="label">Budgets</div><div class="value">1 over 80%</div><div class="meta num">$1,980 of $3,050 spent</div></div>
+  </div>
+
+  <section class="card section" aria-labelledby="nw">
+    <div class="card-head"><h2 id="nw">Net worth, 30 days</h2><span class="legend"><span><i style="background:var(--chart-1)"></i>net worth</span><span><i style="background:var(--chart-2)"></i>30-day average $72,050</span></span></div>
+    <svg class="chart" viewBox="-18 0 796 180" preserveAspectRatio="none" role="img" aria-label="Net worth over 30 days, from $71,400 to $72,640, 30-day average $72,050">
+  <g class="axis">
+    <line x1="44" y1="41.0" x2="752" y2="41.0"/><text x="36" y="45.0">$72,640</text>
+    <line x1="44" y1="123.0" x2="752" y2="123.0"/><text x="36" y="127.0">$71,385</text>
+    <text class="x" x="117.2" y="172">21 Aug</text><text class="xe" x="752.0" y="172">18 Sep</text>
+  </g>
+  <path class="area" d="M117.2,152 L117.2,109.9 L141.7,120.3 L166.1,99.7 L190.5,123.0 L214.9,118.7 L239.3,114.6 L263.7,92.0 L288.1,112.4 L312.6,76.5 L337.0,95.8 L361.4,106.5 L385.8,100.4 L410.2,72.1 L434.6,70.8 L459.0,94.2 L483.4,79.1 L507.9,87.8 L532.3,60.5 L556.7,85.2 L581.1,77.9 L605.5,68.0 L629.9,77.5 L654.3,50.2 L678.8,73.5 L703.2,58.3 L727.6,68.8 L752.0,41.0 L752.0,152 Z"/>
+  <line class="avg" x1="117.2" y1="86.5" x2="752" y2="86.5"/>
+  <polyline class="line" points="117.2,109.9 141.7,120.3 166.1,99.7 190.5,123.0 214.9,118.7 239.3,114.6 263.7,92.0 288.1,112.4 312.6,76.5 337.0,95.8 361.4,106.5 385.8,100.4 410.2,72.1 434.6,70.8 459.0,94.2 483.4,79.1 507.9,87.8 532.3,60.5 556.7,85.2 581.1,77.9 605.5,68.0 629.9,77.5 654.3,50.2 678.8,73.5 703.2,58.3 727.6,68.8 752.0,41.0"/>
+  <circle class="end" cx="752.0" cy="41.0" r="3.5"/>
+</svg>
+    <p class="meta" style="margin:6px 0 0">No balance before 21 August; the gap is left blank rather than drawn.</p>
+  </section>
+
+  <div class="cols section">
+    <section class="acct" aria-labelledby="ac">
+      <h2 id="ac">Accounts <span class="meta">share of assets</span></h2>
+      <table>
+        <thead><tr><th>Account</th><th>Type</th><th class="r">Balance</th><th class="r">30 days</th></tr></thead>
+        <tbody>
+          <tr><td class="wrap"><a href="#">Everyday checking</a><span class="meta">Northwind Bank, updated 06:12</span></td><td class="sub"><div class="bar share"><span style="width:7%"></span></div></td><td class="r">$5,874.62</td><td class="r positive"><span class="meta">+$264</span></td></tr>
+          <tr><td class="wrap"><a href="#">High-yield savings</a><span class="meta">Bluewater Savings, updated 06:12</span></td><td class="sub"><div class="bar share"><span style="width:30%"></span></div></td><td class="r">$24,300.00</td><td class="r"><span class="meta">+$356</span></td></tr>
+          <tr><td class="wrap"><a href="#">Brokerage</a><span class="meta">Harbor Investments, updated 06:11</span></td><td class="sub"><div class="bar share"><span style="width:45%"></span></div></td><td class="r">$36,845.10</td><td class="r"><span class="meta">+$940</span></td></tr>
+          <tr><td class="wrap"><a href="#">Roth IRA</a><span class="meta">Harbor Investments, updated 06:11</span></td><td class="sub"><div class="bar share"><span style="width:17%"></span></div></td><td class="r">$13,962.85</td><td class="r"><span class="meta">+$188</span></td></tr>
+          <tr><td class="wrap"><a href="#">Rewards card</a><span class="meta">Northwind Bank, statement due 3 Oct</span></td><td class="sub"><span class="meta">credit</span></td><td class="r">−$1,187.40</td><td class="r"><span class="meta">−$76</span></td></tr>
+          <tr><td class="wrap"><a href="#">Car loan</a><span class="meta">Granite Auto Finance, manual</span></td><td class="sub"><span class="meta">loan</span></td><td class="r">−$7,155.00</td><td class="r"><span class="meta">+$245 paid</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="stack">
+      <section aria-labelledby="up">
+        <h2 id="up">Upcoming, 14 days <span class="meta">$2,101.78</span></h2>
+        <table>
+          <thead><tr><th>Date</th><th>Charge</th><th class="r">Amount</th></tr></thead>
+          <tbody>
+            <tr><td class="date">Sat 19</td><td class="wrap">Rent<span class="meta">recurring, monthly</span></td><td class="r">$1,640.00</td></tr>
+            <tr><td class="date">Mon 21</td><td class="wrap">Electricity<span class="meta">recurring, varies</span></td><td class="r">$86.40</td></tr>
+            <tr><td class="date">Tue 22</td><td class="wrap">Health Auto Export<span class="meta">subscription</span></td><td class="r">$1.99</td></tr>
+            <tr><td class="date">Thu 24</td><td class="wrap">Cloud storage 2 TB<span class="meta">subscription</span></td><td class="r">$9.99</td></tr>
+            <tr><td class="date">Sat 26</td><td class="wrap">Car loan<span class="meta">recurring, monthly</span></td><td class="r">$245.00</td></tr>
+            <tr><td class="date">Wed 30</td><td class="wrap">Renters insurance<span class="meta">annual, policy renews</span></td><td class="r">$118.40</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="budget" aria-labelledby="bu">
+        <h2 id="bu">Budgets, September <span class="meta num">$1,070 left</span></h2>
+        <div class="rows">
+          <div class="row"><span><span class="title">Groceries</span><div class="bar"><span class="warm" style="width:82%"></span></div></span><span class="right num">$312 <span class="meta">/ $380</span></span></div>
+          <div class="row"><span><span class="title">Eating out</span><div class="bar"><span style="width:61%"></span></div></span><span class="right num">$158 <span class="meta">/ $260</span></span></div>
+          <div class="row"><span><span class="title">Transport</span><div class="bar"><span style="width:36%"></span></div></span><span class="right num">$64 <span class="meta">/ $180</span></span></div>
+          <div class="row"><span><span class="title">Subscriptions</span><div class="bar"><span class="over" style="width:100%"></span></div></span><span class="right num">$58 <span class="meta">/ $45, $13 over</span></span></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="shell.js"></script>
+</body>
+</html>

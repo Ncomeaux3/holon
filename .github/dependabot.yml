@@ -1,0 +1,26 @@
+version: 2
+# holon-ui is a private package on GitHub Packages. Dependabot does not see
+# Actions secrets; DEPENDABOT_NPM_TOKEN is a Dependabot secret (read:packages).
+registries:
+  holon-ui:
+    type: npm-registry
+    url: https://npm.pkg.github.com
+    token: ${{secrets.DEPENDABOT_NPM_TOKEN}}
+updates:
+  - package-ecosystem: npm
+    directory: /
+    registries:
+      - holon-ui
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # One PR a week for the routine bumps. Majors still come in on their own.
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

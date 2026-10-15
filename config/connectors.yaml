@@ -1,0 +1,74 @@
+# The connector catalogue Onboarding offers.
+#
+# A committed config file, not a database table and not a list inside a
+# component: a fork edits this, and it is the one place that knows what a person
+# might plausibly want to connect.
+#
+# Nothing here claims to work. A provider with a matching integration manifest
+# connects for real; everything else records the intent as
+# core.connections.status = 'requested', which is honest: the wish is saved, it
+# shows in Settings, and nothing pretends to sync. That is what lets the list be
+# aspirational without being a lie.
+
+categories:
+  - id: bank
+    name: Banks and credit unions
+    module: finance
+    data: balances and transactions
+    providers:
+      [Chase, Bank of America, Wells Fargo, Capital One, Ally, Citibank, US Bank, PNC,
+       Truist, Charles Schwab Bank, SoFi, Discover Bank, Navy Federal, USAA]
+
+  - id: card
+    name: Credit cards
+    module: finance
+    data: statements, due dates, rewards
+    providers:
+      [Chase, American Express, Capital One, Citi, Discover, Apple Card, Barclays, Synchrony]
+
+  - id: broker
+    name: Brokerages and retirement
+    module: finance
+    data: positions, cost basis, contributions
+    providers:
+      [Fidelity, Vanguard, Charles Schwab, E*TRADE, Robinhood, Merrill Edge,
+       Interactive Brokers, Wealthfront, Betterment, Empower]
+
+  - id: crypto
+    name: Crypto exchanges and wallets
+    module: finance
+    data: holdings and cost basis
+    providers: [Coinbase, Kraken, Gemini, Ledger, Trezor, MetaMask]
+
+  - id: fitness
+    name: Fitness and health
+    module: fitness
+    data: workouts, heart rate, body metrics
+    providers: [Strava, Apple Health (Health Auto Export), Apple Health (Shortcuts), Garmin, Whoop, Oura, Peloton]
+
+  - id: air
+    name: Airline loyalty
+    module: travel
+    data: miles, status, upcoming flights
+    providers:
+      [United MileagePlus, Delta SkyMiles, American AAdvantage, Southwest Rapid Rewards,
+       Alaska Mileage Plan, JetBlue TrueBlue]
+
+  - id: hotel
+    name: Hotel loyalty
+    module: travel
+    data: points, status, stays
+    providers: [Marriott Bonvoy, Hilton Honors, World of Hyatt, IHG One Rewards, Wyndham Rewards]
+
+  - id: insurance
+    name: Insurance carriers
+    module: insurance
+    data: policies, premiums, renewal dates
+    providers:
+      [State Farm, GEICO, Progressive, Allstate, USAA, Farmers, Liberty Mutual, Nationwide]
+
+  - id: notes
+    name: Notes and knowledge
+    module: brain
+    data: notes, highlights, reading
+    providers: [Obsidian, Readwise, Notion, Instapaper, Pocket]

@@ -1,0 +1,72 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+/build
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# secrets
+.env*
+!.env.example
+*.pem
+*.key
+
+# personal data: the owner's Notion exports and other imports
+imports/*
+!imports/.gitkeep
+
+# supabase
+supabase/.temp
+supabase/.branches
+
+# generated indexes
+modules/_index.ts
+integrations/_index.ts
+
+# vercel
+.vercel
+
+# misc
+.DS_Store
+*-debug.log*
+__pycache__/
+.venv/
+
+# playwright mcp scratch
+.playwright-mcp/
+
+# Playwright
+e2e/.auth/
+e2e/.results/
+e2e/__screens__/
+test-results/
+playwright-report/
+.worktrees/
+
+# Local agent tooling. .codex/config.toml carries the pos MCP bearer token.
+.codex/
+.agents/
+
+# Codex workspace file, not part of the template (decision 2026-09-12).
+AGENTS.md
+
+# Worktrees other Claude sessions open inside this checkout
+.claude/worktrees/
+
+# Holon brand kits: 29 MB of masters and renders, sourced from the zip; the
+# app copies only what it uses into public/brand and app/fonts.
+holon-cobalt-sand/
+holon-brand-kit/
+*.zip
+# ad hoc timing and screenshot scripts
+e2e/.scratch/

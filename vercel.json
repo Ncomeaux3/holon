@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "printf '%s\\n' \"$NPM_RC\" > ~/.npmrc && pnpm install",
+  "crons": [
+    {
+      "path": "/api/cron/nightly",
+      "schedule": "0 9 * * *"
+    }
+  ]
+}

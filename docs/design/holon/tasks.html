@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tasks · Holon mockup</title>
+<link rel="stylesheet" href="holon.css">
+<style>
+  .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .toolbar .spacer { flex: 1; }
+  .day { margin-top: 24px; }
+  .day > h2 { font-size: 13px; font-weight: 500; color: var(--ink-3); padding: 0 4px 8px; display: flex; justify-content: space-between; }
+  .day > h2 b { color: var(--ink); font-weight: 600; font-size: 15px; }
+  .row .p1 { color: var(--risk); font-weight: 500; }
+  .row .p2 { color: var(--attention); font-weight: 500; }
+  .row .est { display: block; }
+  .board { max-width: 880px; }
+  .filter { height: 32px; border-radius: var(--radius-sm); border: 1px solid var(--rule-2); background: var(--bg-elev); padding: 0 8px; font-size: 13px; }
+  @media (max-width: 767px) { .toolbar .filter { flex: 1; } }
+</style>
+</head>
+<body data-page="tasks">
+<main>
+  <header class="page-head">
+    <div><h1 class="t-headline">Tasks</h1><p>12 open this week, 1 overdue. Swipe right to finish, left to reopen.</p></div>
+    <a class="btn primary" href="task-drawer.html">New task</a>
+  </header>
+
+  <div class="toolbar">
+    <div class="segments" role="group" aria-label="View">
+      <button aria-pressed="false">Today</button><button aria-pressed="true">This week</button><button aria-pressed="false">By goal</button><button aria-pressed="false">By project</button><button aria-pressed="false">Review</button><button aria-pressed="false">Done</button><button aria-pressed="false">Calendar</button>
+    </div>
+    <span class="spacer"></span>
+    <select class="filter" aria-label="Project"><option>All projects</option><option>Holon launch</option><option>Move flat</option><option>Consulting</option></select>
+    <button class="btn sm quiet" type="button">Projects</button>
+  </div>
+
+  <div class="board">
+    <section class="day">
+      <h2><span><b>Today</b>, Friday 18</span><span>5 tasks, about 2 h</span></h2>
+      <div class="rows">
+        <div class="row"><span class="lead"><button class="check" role="checkbox" aria-checked="false" aria-label="Done"></button></span><span><span class="title">Send the Q3 invoice to Brightwater</span><span class="meta"><span class="p1">P1</span> · <span class="row-links"><a href="#">Consulting</a></span> · due yesterday</span></span><span class="right"><span class="meta est">30 min</span></span></div>
+        <div class="row selected"><span class="lead"><button class="check" role="checkbox" aria-checked="false" aria-label="Done"></button></span><span><span class="title">Draft the Holon onboarding copy</span><span class="meta"><span class="row-links"><a href="#">Holon launch</a><span class="sep">›</span><a href="#">Ship Holon by October</a></span></span></span><span class="right"><span class="meta est">45 min</span></span></div>
+        <div class="row"><span class="lead"><button class="check" role="checkbox" aria-checked="false" aria-label="Done"></button></span><span><span class="title">Book the dentist</span><span class="meta">no project</span></span><span class="right"><span class="meta est">10 min</span></span></div>
+        <div class="row"><span class="lead"><button class="check" role="checkbox" aria-checked="false" aria-label="Done"></button></span><span><span class="title">Read chapter 4 of Designing Data-Intensive Applications</span><span class="meta"><span class="row-links"><a href="#">Reading</a></span></span></span><span class="right"><span class="meta est">40 min</span></span></div>
+        <div class="row done"><span class="lead"><button class="check" role="checkbox" aria-checked="true" aria-label="Done"></button></span><span><span class="title">Morning run, 5 km</span><span class="meta">done 07:31</span></span><span class="right"><span class="meta est"></span></span></div>
+      </div>
+    </section>
+
+    <section class="day">
+      <h2><span><b>Tomorrow</b>, Saturday 19</span><span>2 tasks</span></h2>
+      <div class="rows">
+        <div class="row"><span class="lead"><button class="check" role="checkbox" aria-checked="false" aria-label="Done"></button></span><span><span class="title">Measure the new flat for the bookshelves</span><span class="meta"><span class="row-links"><a href="#">Move flat</a></span></span></span><span class="right"><span class="meta est">1 h</span></span></div>
+        <div class="row"><span class="lead"><button class="check" role="checkbox" aria-checked="false" aria-label="Done"></button></span><span><span class="title">Compare the two movers' quotes</span><span class="meta"><span class="p2">P2</span> · <span class="row-links"><a href="#">Move flat</a></span></span></span><span class="right"><span class="meta est">20 min</span></span></div>
+      </div>
+    </section>
+
+    <section class="day">
+      <h2><span><b>Monday</b> 21</span><span>3 tasks</span></h2>
+      <div class="rows">
+        <div class="row"><span class="lead"><button class="check" role="checkbox" aria-checked="false" aria-label="Done"></button></span><span><span class="title">Write the Holon release notes</span><span class="meta"><span class="row-links"><a href="#">Holon launch</a><span class="sep">›</span><a href="#">Ship Holon by October</a></span></span></span><span class="right"><span class="meta est">1 h</span></span></div>
+        <div class="row"><span class="lead"><button class="check" role="checkbox" aria-checked="false" aria-label="Done"></button></span><span><span class="title">Set up the Vercel preview domain</span><span class="meta"><span class="row-links"><a href="#">Holon launch</a></span></span></span><span class="right"><span class="meta est">30 min</span></span></div>
+        <div class="row"><span class="lead"><button class="check" role="checkbox" aria-checked="false" aria-label="Done"></button></span><span><span class="title">Call the landlord about the deposit</span><span class="meta"><span class="row-links"><a href="#">Move flat</a></span></span></span><span class="right"><span class="meta est">15 min</span></span></div>
+      </div>
+    </section>
+
+    <section class="day">
+      <h2><span><b>Thursday</b> 24</span><span>2 tasks</span></h2>
+      <div class="rows">
+        <div class="row"><span class="lead"><button class="check" role="checkbox" aria-checked="false" aria-label="Done"></button></span><span><span class="title">Pack for Copenhagen</span><span class="meta"><span class="row-links"><a href="#">Copenhagen, September</a></span></span></span><span class="right"><span class="meta est">1 h</span></span></div>
+        <div class="row"><span class="lead"><button class="check" role="checkbox" aria-checked="false" aria-label="Done"></button></span><span><span class="title">Send Brightwater the September summary</span><span class="meta"><span class="row-links"><a href="#">Consulting</a></span></span></span><span class="right"><span class="meta est">20 min</span></span></div>
+      </div>
+    </section>
+  </div>
+</main>
+<script src="shell.js"></script>
+</body>
+</html>

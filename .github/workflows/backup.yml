@@ -1,0 +1,144 @@
+name: Backup
+
+on:
+  schedule:
+    # 04:10 UTC, after the 09:00 UTC nightly run has long finished for the
+    # previous day and well before the next one.
+    - cron: '10 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # Only what the database dump needs. The storage secrets are checked by
+      # the mirror step, so a missing one costs the mirror, never the dump:
+      # from 2026-09-16 to 2026-10-11 a missing SUPABASE_ACCESS_TOKEN failed
+      # this step and no dump was taken for 25 days.
+      - name: Check backup secrets
+        env:
+          PGURL: ${{ secrets.BACKUP_DATABASE_URL }}
+          BACKUP_REPO_TOKEN: ${{ secrets.BACKUP_REPO_TOKEN }}
+        run: |
+          test -n "$PGURL" || { echo "BACKUP_DATABASE_URL is not set"; exit 1; }
+          test -n "$BACKUP_REPO_TOKEN" || { echo "BACKUP_REPO_TOKEN is not set"; exit 1; }
+
+      - name: Install a matching pg_dump
+        run: |
+          sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+
+      - name: Dump
+        env:
+          # The session mode pooler on 5432, not the direct connection and not
+          # transaction mode on 6543. GitHub runners are IPv4 only and the
+          # direct host is IPv6 only; transaction mode does not give pg_dump the
+          # session semantics it needs.
+          PGURL: ${{ secrets.BACKUP_DATABASE_URL }}
+        # The 17 binary by path: the runner's preinstalled 16 wins on PATH, and
+        # it refuses a 17 server. pipefail, because without it the pipe takes
+        # gzip's status and an aborted pg_dump left a green run and a 20 byte
+        # file every night from 2026-09-12 to 2026-10-11. The size floor
+        # catches any other way to an empty dump.
+        run: |
+          set -o pipefail
+          mkdir -p out
+          file="out/pos-$(date -u +%Y-%m-%d).sql.gz"
+          /usr/lib/postgresql/17/bin/pg_dump "$PGURL" --no-owner --no-privileges | gzip -9 > "$file"
+          ls -lh out/
+          test "$(stat -c %s "$file")" -gt 1024 || { echo "::error::Dump is under 1 kB"; exit 1; }
+
+      # The per-module storage buckets (insurance PDFs, health records) are not
+      # in a pg_dump. The CLI mirrors every bucket into the same repo, beside
+      # the dumps. ss:/// with no bucket is all of them. A file deleted from a
+      # bucket stays in the mirror; nothing prunes it, which for a backup is
+      # the right way round.
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.117.0
+
+      # continue-on-error: a mirror that fails (an expired or wrong token)
+      # must not stop the dump from being committed. The run still goes red
+      # in the last step, and the POS alert still fires.
+      - name: Mirror storage
+        id: mirror
+        continue-on-error: true
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          mkdir -p out/storage
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ] || [ -z "$REF" ]; then
+            echo "::error::Storage not mirrored: SUPABASE_ACCESS_TOKEN or SUPABASE_PROJECT_REF is not set"
+            echo "skipped=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          supabase storage cp -r ss:/// out/storage --experimental --project-ref "$REF"
+          find out/storage -type f | wc -l
+
+      - name: Checkout the backup repo
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ github.repository_owner }}/pos-backups
+          token: ${{ secrets.BACKUP_REPO_TOKEN }}
+          path: backups
+
+      - name: Commit, and drop anything older than thirty days
+        working-directory: backups
+        run: |
+          mkdir -p dumps storage
+          cp ../out/*.sql.gz dumps/
+          cp -r ../out/storage/. storage/
+          find dumps -name '*.sql.gz' -mtime +30 -delete
+
+          git config user.name 'pos-backup'
+          git config user.email 'pos-backup@users.noreply.github.com'
+          git add dumps storage
+          # An unchanged tree means the dump was identical, which is not a
+          # failure worth a red run.
+          git diff --staged --quiet || git commit -m "Backup $(date -u +%Y-%m-%d)"
+          git push
+
+      # The cron-silence check. At 04:10 UTC the last 09:00 UTC nightly is 19
+      # hours old and a missed one is 43, so 36 is the line. A failed run is
+      # excluded on purpose: every job failing sent no digest either. Partial
+      # counts as fired; the dashboard already surfaces single job failures.
+      # After the commit, so the dump still lands when this goes red; a failed
+      # scheduled run is what GitHub emails the owner about.
+      # ponytail: any trigger counts, so a run by hand hides a dead cron for a
+      # day. Add "and trigger_source = 'cron'" once the production cron has
+      # fired; before that the filter would be red every morning.
+      - name: Check the nightly fired
+        env:
+          PGURL: ${{ secrets.BACKUP_DATABASE_URL }}
+        run: |
+          runs=$(psql "$PGURL" -Atc "select count(*) from core.job_runs
+            where finished_at > now() - interval '36 hours'
+              and status in ('clean', 'partial')")
+          echo "nightly runs in the last 36 hours: $runs"
+          test "$runs" -gt 0 || { echo "no clean or partial nightly in 36 hours"; exit 1; }
+
+      # The dump landed above; a skipped mirror still turns the run red.
+      - name: Fail when storage was not mirrored
+        if: always() && (steps.mirror.outputs.skipped == 'true' || steps.mirror.outcome == 'failure')
+        run: exit 1
+
+      # A red run as a POS alert, not only GitHub's email: the dashboard and
+      # the nightly digest both read core.notifications. Needs the database
+      # secret, so a run missing that one is left to GitHub's email.
+      - name: Tell POS the backup workflow failed
+        if: failure()
+        env:
+          PGURL: ${{ secrets.BACKUP_DATABASE_URL }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          test -n "$PGURL" || exit 0
+          command -v psql >/dev/null || exit 0
+          psql "$PGURL" -v ON_ERROR_STOP=1 -v run_url="$RUN_URL" <<'SQL'
+          insert into core.notifications (channel, title, body, urgency)
+          values ('email', 'Backup workflow failed', 'A step failed: the dump, the storage mirror, or the nightly-fired check. The log names which. Run: ' || :'run_url', 'urgent');
+          SQL

@@ -1,0 +1,13 @@
+<h2>Your POS sign-in code</h2>
+
+<p style="font-size:28px;letter-spacing:0.3em;font-family:ui-monospace,monospace">{{ .Token }}</p>
+
+<p>Type it into the sign-in screen you already have open. It expires in 15 minutes and works once.</p>
+
+<p>
+  On the machine that asked for it, this link does the same thing:
+  <a href="{{ .ConfirmationURL }}">sign in</a>. Opened anywhere else it will not work, which is why
+  the code is there.
+</p>
+
+<p>If you did not ask for this, nothing has happened and you can ignore it.</p>

@@ -1,0 +1,213 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+# A second push to the same branch makes the first run pointless.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # holon-ui is a private GitHub Packages npm package. pnpm only reads a
+      # registry credential from user-level config, so it is set here, not in .npmrc.
+      - run: pnpm config set //npm.pkg.github.com/:_authToken "$NODE_AUTH_TOKEN"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+      - run: pnpm install --frozen-lockfile
+
+      # Known-vulnerable dependencies fail the build. --prod so a dev-only
+      # advisory in a test runner does not block a merge.
+      - run: pnpm audit --prod --audit-level=high
+
+      # The suites talk to Postgres, so the same Docker stack the owner runs
+      # locally comes up here. supabase start is what CI and a laptop share.
+      # v3 installs from npm. v1 asked the GitHub API for the latest release,
+      # which is rate limited on an unauthenticated runner and failed runs.
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.117.0
+
+      - name: Start Supabase
+        run: supabase start
+
+      # Only what the tests actually need. No provider keys: a suite that
+      # needed one would be a suite reaching the network, which none do.
+      - name: Write .env
+        run: |
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$(supabase status -o env | grep '^API_URL=' | cut -d= -f2- | tr -d '\"')"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$(supabase status -o env | grep '^ANON_KEY=' | cut -d= -f2- | tr -d '\"')"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$(supabase status -o env | grep '^SERVICE_ROLE_KEY=' | cut -d= -f2- | tr -d '\"')"
+            echo "DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+            echo "OWNER_EMAIL=ci@example.com"
+            echo "ENCRYPTION_KEY=$(openssl rand -base64 32)"
+            echo "CRON_SECRET=$(openssl rand -hex 16)"
+            echo "MCP_TOKEN=$(openssl rand -hex 16)"
+            node -e "const k=require('web-push').generateVAPIDKeys();console.log('VAPID_PUBLIC_KEY='+k.publicKey);console.log('VAPID_PRIVATE_KEY='+k.privateKey)"
+            echo "VAPID_SUBJECT=mailto:ci@example.com"
+            echo "STRAVA_CLIENT_ID="
+            echo "STRAVA_CLIENT_SECRET="
+          } > .env
+
+      - run: pnpm typecheck
+      - run: pnpm lint
+      # The holon-apple sweep guard: no arbitrary type or radius in a swept module.
+      - run: bash scripts/check-tokens.sh
+
+      # The login page shipped with a class that was a thrown-error string:
+      # a client module's export interpolated by a server component. Dev does
+      # not show it and next build exits 0 (the page is dynamic, nothing
+      # renders it at build time), so the built server is asked for /login.
+      - run: pnpm build
+      - name: Serve /login from the build
+        run: |
+          pnpm start &
+          for i in $(seq 1 30); do curl -sf -o login.html localhost:3000/login && break; sleep 1; done
+          grep -qF 'w-full min-h-(--target) rounded-control' login.html
+          if grep -q 'Attempted to call' login.html; then exit 1; fi
+
+      # vitest builds its own pos_test database from the migrations, so this
+      # also proves every migration replays on a clean Postgres.
+      - run: pnpm test
+
+  screens:
+    runs-on: ubuntu-latest
+    # Playwright over both projects is 189 tests and climbing; the runner took
+    # 20 minutes to get through 164 of them plus four of setup.
+    timeout-minutes: 40
+    needs: check
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # holon-ui is a private GitHub Packages npm package. pnpm only reads a
+      # registry credential from user-level config, so it is set here, not in .npmrc.
+      - run: pnpm config set //npm.pkg.github.com/:_authToken "$NODE_AUTH_TOKEN"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+
+      # v3 installs from npm. v1 asked the GitHub API for the latest release,
+      # which is rate limited on an unauthenticated runner and failed runs.
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.117.0
+      - name: Start Supabase
+        run: supabase start
+
+      - name: Write .env
+        run: |
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$(supabase status -o env | grep '^API_URL=' | cut -d= -f2- | tr -d '\"')"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$(supabase status -o env | grep '^ANON_KEY=' | cut -d= -f2- | tr -d '\"')"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$(supabase status -o env | grep '^SERVICE_ROLE_KEY=' | cut -d= -f2- | tr -d '\"')"
+            echo "DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+            echo "OWNER_EMAIL=ci@example.com"
+            echo "ENCRYPTION_KEY=$(openssl rand -base64 32)"
+            echo "CRON_SECRET=$(openssl rand -hex 16)"
+            echo "MCP_TOKEN=$(openssl rand -hex 16)"
+            node -e "const k=require('web-push').generateVAPIDKeys();console.log('VAPID_PUBLIC_KEY='+k.publicKey);console.log('VAPID_PRIVATE_KEY='+k.privateKey)"
+            echo "VAPID_SUBJECT=mailto:ci@example.com"
+            echo "STRAVA_CLIENT_ID="
+            echo "STRAVA_CLIENT_SECRET="
+          } > .env
+
+      # The screens need an owner user and the demo fixture, same as a laptop.
+      - run: pnpm setup:demo
+
+      # playwright.config starts the dev server itself.
+      - run: pnpm test:e2e
+
+      # The results directory is hidden, and upload-artifact skips hidden
+      # paths unless told otherwise: every failed run so far uploaded nothing.
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-failures
+          path: e2e/.results/
+          include-hidden-files: true
+          retention-days: 7
+
+  migrations:
+    # A migration in the diff is code that deploys on merge; the schema it needs
+    # only reaches production when someone runs `supabase db push` by hand.
+    # On 2026-09-13 and again on 2026-09-15 that gap shipped code ahead of its
+    # schema and the nightly came back partial, naming a table that did not
+    # exist (finance.settings, then brain.note_hub). CI holds no production
+    # credentials, by choice, so it cannot check whether the push happened. It
+    # asks instead, and the answer has to be written down where the next person
+    # reading the PR can see it.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The diff is against the base commit, which a shallow clone lacks.
+          fetch-depth: 0
+
+      - name: A new migration needs a db push
+        env:
+          # Read as data, never interpolated into the script. A PR body is
+          # written by whoever opened the PR and this repository is public.
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          added=$(git diff --name-only --diff-filter=A "$BASE_SHA" HEAD -- supabase/migrations)
+
+          if [ -z "$added" ]; then
+            echo "No new migrations in this PR."
+            exit 0
+          fi
+
+          echo "This PR adds:"
+          echo "$added" | sed 's/^/  /'
+          echo
+
+          # A line of its own, optionally a bullet or a ticked checkbox, because
+          # that is what a person reaches for. Anchored at both ends so prose
+          # that happens to say "db push" does not clear the gate.
+          if printf '%s' "$PR_BODY" | tr -d '\r' |
+             grep -qiE '^[[:space:]]*([-*][[:space:]]*(\[[ xX]\][[:space:]]*)?)?db push:[[:space:]]*(done|not needed)[[:space:]]*$'; then
+            echo "Acknowledged in the PR description."
+            exit 0
+          fi
+
+          echo "Merging deploys this code to production. The schema it needs does"
+          echo "not follow on its own: supabase db push is manual."
+          echo
+          echo "  supabase db push"
+          echo "  supabase migration list --linked   # local and remote should match"
+          echo
+          echo "Then add one line to the PR description:"
+          echo
+          echo "  db push: done"
+          echo
+          echo "Or, if this migration should not reach production yet:"
+          echo
+          echo "  db push: not needed"
+          exit 1
