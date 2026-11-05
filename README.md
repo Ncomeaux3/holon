@@ -8,6 +8,16 @@ Personal Operating System. Single user, modular, fork and fill.
 - SETUP.md: workspace setup and the per-module loop.
 - CLAUDE.md: rules for Claude Code sessions in this repo.
 
+## Screenshots
+
+Every screen below runs on the synthetic rows from `pnpm setup:demo` and the e2e fixture. None of it is real data.
+
+| Today | Finance |
+|---|---|
+| ![Today: the nightly summary, items that need attention, and agent proposals waiting for review](docs/screenshots/today.jpg) | ![Finance: net worth, 30-day change, bills due, and the net worth chart](docs/screenshots/finance.jpg) |
+| **Goals** | **Calendar** |
+| ![Goals: progress, pace, and deadline for each goal](docs/screenshots/goals.jpg) | ![Calendar: one month of everything dated across modules](docs/screenshots/calendar.jpg) |
+
 ## Quickstart for a fork
 
 Needs Docker Desktop, Node 22, pnpm, and the Supabase CLI.
