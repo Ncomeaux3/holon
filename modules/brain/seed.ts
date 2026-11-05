@@ -62,7 +62,7 @@ const NOTES: {
       'Every new technology costs innovation tokens. Spend them on the product, not',
       'the stack.',
       '',
-      'The POS stack is deliberately boring: Postgres, Next.js, one cron. The order it',
+      'The Holon stack is deliberately boring: Postgres, Next.js, one cron. The order it',
       'is built in is [[Build order]].',
     ].join('\n'),
     vault: { path: 'Articles/The boring technology club.md', sha: 'a1f9c2e4b7d0' },

@@ -1589,7 +1589,7 @@ test('notifications, a swipe reads a row and the other way snoozes it', async ({
   // Left snoozes for a day: one fewer row altogether, not a History row, and
   // still gone after a reload, so the query behind the screen agrees with
   // the swipe.
-  const pace = 'Ship POS v1 projects to 12 Nov'
+  const pace = 'Ship Holon v1 projects to 12 Nov'
   const paceUnread = await unreadRow(pace).count()
   const paceRows = await anyRow(pace).count()
   expect(paceUnread).toBeGreaterThan(0)

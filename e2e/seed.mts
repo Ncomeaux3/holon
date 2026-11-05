@@ -190,7 +190,7 @@ await db().query(
         'Premium up 6%, $1,152 for the year', interval '20 hours', 'normal', null),
        ('finance', 'budget_pacing',  'inapp', 'Dining budget at 92%',
         '$38 left with 19 days to go', interval '28 hours', 'normal', null),
-       ('goals',   'pace_at_risk',   'email', 'Ship POS v1 projects to 12 Nov',
+       ('goals',   'pace_at_risk',   'email', 'Ship Holon v1 projects to 12 Nov',
         'Three weeks past target at the current pace', interval '30 hours', 'normal', null),
        ('travel',  'flight_checkin', 'push',  'Check in for WN 2087 opened',
         'RDU to SLC, 07:40 tomorrow', interval '3 days', 'normal', now()),

@@ -51,7 +51,7 @@ export default async function CalendarPage() {
       <PageHeader
         eyebrow="Calendar"
         title="Calendar"
-        lede="Everything dated in POS, and the events you add here."
+        lede="Everything dated in Holon, and the events you add here."
         status={band}
         actions={<NewEventButton />}
         phoneAction={<NewEventButton phone />}

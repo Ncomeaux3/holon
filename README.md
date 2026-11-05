@@ -1,6 +1,6 @@
-# POS
+# Holon
 
-Personal Operating System. Single user, modular, fork and fill.
+A personal operating system. Single user, modular, fork and fill.
 
 - docs/ARCHITECTURE.md: how it is built and how a module or integration plugs in.
 - docs/SPEC.md: what each module does.
