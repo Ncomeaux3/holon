@@ -1,4 +1,4 @@
-# POS (Personal Operating System)
+# Holon (Personal Operating System)
 
 Single-user personal operating system: a database-backed app with modules (Finance, Skill Tree, Tasks, Goals, Insurance, Second Brain, Ideas, Fitness, Meals, Travel) plus an orchestrator agent that reads module digests. This repo is also the Claude Code workspace that builds and operates it, and it is a fork-and-fill template: the code holds nothing personal.
 

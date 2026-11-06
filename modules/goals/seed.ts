@@ -73,7 +73,7 @@ const GOALS: Demo[] = [
   },
   {
     external_id: 'demo-4',
-    title: 'Ship POS Phase 1',
+    title: 'Ship Holon Phase 1',
     notes: 'Sixteen steps in the phase plan.',
     area: 'Engineering',
     kind: 'count',

@@ -1,4 +1,4 @@
-# POS Architecture
+# Holon Architecture
 
 Durable technical design. docs/SPEC.md says what each module does. This file says how the system is built, how a module or integration plugs in, and how the platform concerns are handled. Decisions and their reasons are logged in the private working repo.
 

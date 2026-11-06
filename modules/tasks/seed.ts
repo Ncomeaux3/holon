@@ -4,7 +4,7 @@ import { register } from '@/core/entities'
 // Synthetic rows for `pnpm setup --demo`. Upserts on external_id so running it
 // twice does not duplicate. Nothing here is personal; this ships in the template.
 
-const PROJECTS = ['POS', 'Home', 'Health', 'Career', 'Finance', 'Learning']
+const PROJECTS = ['Holon', 'Home', 'Health', 'Career', 'Finance', 'Learning']
 
 /**
  * Due dates are offsets from today, not fixed dates, so the board looks the
@@ -25,7 +25,7 @@ const TASKS: {
   status?: 'open' | 'review' | 'done'
   doneDaysAgo?: number
 }[] = [
-  { external_id: 'demo-1', title: 'Recurring detection tests', notes: 'Same merchant, amount within 10 percent, weekly or monthly or yearly cadence.', dueInDays: -1, priority: 'P1', project: 'POS', estimate: 90 },
+  { external_id: 'demo-1', title: 'Recurring detection tests', notes: 'Same merchant, amount within 10 percent, weekly or monthly or yearly cadence.', dueInDays: -1, priority: 'P1', project: 'Holon', estimate: 90 },
   { external_id: 'demo-2', title: 'Read DDIA ch. 5, Replication', dueInDays: 0, priority: 'P2', project: 'Learning', estimate: 40 },
   // demo-2b exists so the swipe to complete gesture has a task of its own. It
   // shared demo-2 with the click to complete test, which runs in the desktop
@@ -35,8 +35,8 @@ const TASKS: {
   { external_id: 'demo-3', title: 'Lower, deadlift day', dueInDays: 0, at: '17:30', priority: 'P2', project: 'Health', estimate: 60, remind: 30 },
   { external_id: 'demo-4', title: 'Pay the card statement', dueInDays: 1, at: '09:00', priority: 'P1', project: 'Finance', estimate: 5 },
   { external_id: 'demo-5', title: 'Renew the renters policy', notes: 'Quote saved. Compare against one more carrier.', dueInDays: 3, priority: 'P2', project: 'Home', estimate: 30 },
-  { external_id: 'demo-6', title: 'Ship the Search page and the palette', dueInDays: 4, priority: 'P1', project: 'POS', estimate: 180 },
-  { external_id: 'demo-7', title: 'Update the resume with the POS project', dueInDays: 5, priority: 'P3', project: 'Career', estimate: 45 },
+  { external_id: 'demo-6', title: 'Ship the Search page and the palette', dueInDays: 4, priority: 'P1', project: 'Holon', estimate: 180 },
+  { external_id: 'demo-7', title: 'Update the resume with the Holon project', dueInDays: 5, priority: 'P3', project: 'Career', estimate: 45 },
   { external_id: 'demo-8', title: 'Meal prep for the week', dueInDays: 6, priority: 'P3', project: 'Health', estimate: 120 },
   { external_id: 'demo-9', title: 'Fix the garage door sensor', dueInDays: 12, priority: 'P3', project: 'Home', estimate: 30 },
   { external_id: 'demo-10', title: 'Rebalance the index funds', dueInDays: 30, priority: 'P2', project: 'Finance', estimate: 30 },
@@ -48,11 +48,11 @@ const TASKS: {
   { external_id: 'demo-16', title: 'Call the carrier about the umbrella policy', notes: 'Quote reference is on the Insurance page.', dueInDays: -2, at: '09:00', priority: 'P2', project: 'Home', estimate: 15 },
 
   // Agent proposed, so the Review view has something in it.
-  { external_id: 'demo-12', title: 'Test the bank sync against three months of history', notes: 'Cadence detection needs at least three monthly cycles.', dueInDays: 2, priority: 'P1', project: 'POS', estimate: 60, source: 'agent', status: 'review' },
+  { external_id: 'demo-12', title: 'Test the bank sync against three months of history', notes: 'Cadence detection needs at least three monthly cycles.', dueInDays: 2, priority: 'P1', project: 'Holon', estimate: 60, source: 'agent', status: 'review' },
   { external_id: 'demo-13', title: 'Book the rental car', notes: 'The trip has flights but no ground transport.', dueInDays: 8, priority: 'P2', project: 'Home', estimate: 20, source: 'agent', status: 'review' },
 
   // Done, so the Done view has both of its columns.
-  { external_id: 'demo-14', title: 'Sidebar collapse and the theme toggle', dueInDays: -2, priority: 'P2', project: 'POS', estimate: 60, status: 'done', doneDaysAgo: 0 },
+  { external_id: 'demo-14', title: 'Sidebar collapse and the theme toggle', dueInDays: -2, priority: 'P2', project: 'Holon', estimate: 60, status: 'done', doneDaysAgo: 0 },
   { external_id: 'demo-15', title: 'Upper, bench day', dueInDays: -1, priority: 'P2', project: 'Health', estimate: 55, status: 'done', doneDaysAgo: 2 },
 ]
 

@@ -1,4 +1,4 @@
-# POS Spec
+# Holon Spec
 
 Full module specification. Loaded on demand via the /module skill or @docs/SPEC.md. Not loaded every session.
 
